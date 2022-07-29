@@ -3,6 +3,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 
 ## Installation
 - Install Melon Loader (using [Melon Loader Automated Installer](https://melonwiki.xyz/#/?id=automated-installation))
+- Download the .dll [here](https://github.com/keifufu/QuickShop/releases/latest)
 - Move the .dll into your Mods directory (GameFolder/Mods/)
 - (optional) Configure file created at (Mods/QuickShop.cfg)
 
