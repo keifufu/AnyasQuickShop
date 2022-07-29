@@ -21,7 +21,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 | PriceDiscount | 15 | Discounts the price by x% |
 | BuyAdditionalParts | true | Whether to buy required parts (Ex: When buying a Piston, it buys Piston Rings) |
 | BuyNormalPartIfTunedPartDoesntExist  | false | Self explanatory |
-| DisableWarningMessage | false | Disables "No tuning part was found, buying normal part instead." Message for the setting above |
+| DisableWarningMessage | false | Disables "No tuned part was found, buying normal part instead." Message for the setting above |
 | AlwaysBuyTunedPart  | false | Buys a tuned part if possible by using either Hotkey |
 
 ## TODO
