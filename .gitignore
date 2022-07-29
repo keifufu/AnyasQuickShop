@@ -1,0 +1,6 @@
+QuickShop/bin/*
+QuickShop/obj/*
+*.snk
+.idea
+.vs
+packages
