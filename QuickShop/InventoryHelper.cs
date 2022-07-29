@@ -21,7 +21,7 @@ namespace QuickShop
             return Convert.ToInt32(price);
         }
 
-        private bool TuningPartExists(string ItemId)
+        private bool TunedPartExists(string ItemId)
         {
             if (ItemId == "" || ItemId == null || ItemId == "t_") return false;
             if (!ItemId.StartsWith("t_"))
@@ -43,26 +43,26 @@ namespace QuickShop
             return item;
         }
 
-        public void BuyPart(string ItemId, bool buyTuning = false)
+        public void BuyPart(string ItemId, bool buyTuned = false)
         {
             if (ItemId == "" || ItemId == "t_" || ItemId == null) return;
 
             var inventory = Singleton<Inventory>.Instance;
             var uiManager = UIManager.Get();
 
-            // Check if a tuning variant exists and change itemId accordingly
-            if (buyTuning)
+            // Check if a tuned variant exists and change itemId accordingly
+            if (buyTuned)
             {
-                if (!TuningPartExists(ItemId))
+                if (!TunedPartExists(ItemId))
                 {
                     if (!_config.BuyNormalPartIfTunedPartDoesntExist && !_config.AlwaysBuyTunedPart)
                     {
-                        uiManager.ShowPopup(Config.ModName, "No tuning part was found.", PopupType.Normal);
+                        uiManager.ShowPopup(Config.ModName, "No tuned part was found.", PopupType.Normal);
                         return;
                     }
                     else if (!_config.DisableWarningMessage && !_config.AlwaysBuyTunedPart)
                     {
-                        uiManager.ShowPopup(Config.ModName, "No tuning part was found, buying normal part instead.", PopupType.Buy);
+                        uiManager.ShowPopup(Config.ModName, "No tuned part was found, buying normal part instead.", PopupType.Buy);
                     }
                 }
                 else
@@ -89,7 +89,7 @@ namespace QuickShop
                     {
                         string additionalPartId = additionalPart;
                         if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuning && TuningPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
+                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
                             additionalPartId = $"t_{additionalPartId}";
                         FinalPrice += CalculatePrice(additionalPartId);
                     }
@@ -178,7 +178,7 @@ namespace QuickShop
                     {
                         string additionalPartId = additionalPart;
                         if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuning && TuningPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
+                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
                             additionalPartId = $"t_{additionalPartId}";
                         Item additionalItem = ItemFromID(additionalPartId);
                         inventory.Add(additionalItem, true);
