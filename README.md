@@ -1,5 +1,5 @@
 # Anya's QuickShop
-A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_Mechanic_Simulator_2021/) Mod for [Melon Loader](https://melonwiki.xyz/#/?id=automated-installation) which allows players to purchase parts with the press of a button.
+A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_Mechanic_Simulator_2021/) Mod for [Melon Loader](https://melonwiki.xyz) which allows players to purchase parts with the press of a button.
 
 ## Installation
 - Install Melon Loader (using [Melon Loader Automated Installer](https://melonwiki.xyz/#/?id=automated-installation))
