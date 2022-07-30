@@ -30,6 +30,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
  - [x] Make purchasing body parts possible
  - [x] Add price calculation for rims and tires
  - [x] Purchase correct rim and tire size on cars with multiple wheel sizes
+ - [ ] Add ET option to config
 
 ## QuickShop_parts.json
 - Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
