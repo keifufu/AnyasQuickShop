@@ -1,7 +1,7 @@
 ﻿using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(QuickShop.QuickShop), "QuickShop", "0.2.0", "keifufu")]
+[assembly: MelonInfo(typeof(QuickShop.QuickShop), "QuickShop", "0.3.0", "keifufu")]
 [assembly: MelonGame("Red Dot Games", "Car Mechanic Simulator 2021")]
 namespace QuickShop
 {
