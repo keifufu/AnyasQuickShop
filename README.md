@@ -28,11 +28,13 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 
 ## TODO
  - [x] Make purchasing body parts possible
- - [ ] Add price calculation for rims and tires
+ - [x] Add price calculation for rims and tires
+ - [x] Purchase correct rim and tire size on cars with multiple wheel sizes
 
-## QuickShop_parts.json:
-Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
-Id's can be figured out by using `CTRL + N`
+## QuickShop_parts.json
+- Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
+- Ids can be figured out by using `CTRL + N`
+- If you're messing with this you probably know what you're doing anyway
 
 ## Credits
 - Inspired by RIDI's [QuickShop](https://www.nexusmods.com/carmechanicsimulator2021/mods/15)

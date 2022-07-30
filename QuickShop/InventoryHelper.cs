@@ -13,6 +13,7 @@ namespace QuickShop
 
         private int CalculatePrice(string ItemId)
         {
+            if (ItemId.Contains("rim_") || ItemId.Contains("tire_")) return 0;
             int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).Price;
             return CalculateDiscount(price);
         }
@@ -99,78 +100,62 @@ namespace QuickShop
             }
 
             // Create license plate
-            if (ItemId.Contains("license"))
+            if (ItemId.Contains("license_"))
             {
-                LPData w = new LPData
+                LPData licensePlate = new LPData
                 {
                     Name = _config.LicensePlateType,
                     Custom = _config.LicensePlateText
                 };
-                item.LPData = w;
+                item.LPData = licensePlate;
                 item.ID = "LicensePlate";
                 // Apply Fixed price for License Plate
                 FinalPrice += CalculateDiscount(100);
             }
 
-            // Calculate rim data
+            // Calculate rim data and price
             if (ItemId.Contains("rim_"))
             {
-                string CarDefaultWheel = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
-                if (CarDefaultWheel.Contains("|"))
+                string FactoryTireSize = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
+                bool isFrontTires = IsFocusedWheelFront();
+
+                string[] WheelSizes = (FactoryTireSize.Contains("|"))
+                    ? FactoryTireSize.Split('|')[isFrontTires ? 0 : 1].Split('R')
+                    : FactoryTireSize.Split('R');
+
+                int WheelSize = Int32.Parse(WheelSizes[1]);
+
+                WheelData wheel = new WheelData
                 {
-                    string[] WheelSizes = CarDefaultWheel.Split('|')[0].Split('R');
-                    WheelData wheel = new WheelData
-                    {
-                        Size = Int32.Parse(WheelSizes[1])
-                    };
-                    item.WheelData = wheel;
-                }
-                else
-                {
-                    string[] WheelSizes = CarDefaultWheel.Split('R');
-                    WheelData wheel = new WheelData
-                    {
-                        Size = Int32.Parse(WheelSizes[1])
-                    };
-                    item.WheelData = wheel;
-                }
+                    Size = WheelSize
+                };
+                item.WheelData = wheel;
+                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemId, WheelSize, 0));
             }
 
-            // Calculate tire data
+            // Calculate tire data and price
             if (ItemId.Contains("tire_"))
             {
-                string CarDefaultWheel = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
-                if (CarDefaultWheel.Contains("|"))
+                string FactoryTireSize = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
+                bool isFrontTires = IsFocusedWheelFront();
+
+                string[] WheelSizes = (FactoryTireSize.Contains("|"))
+                    ? FactoryTireSize.Split('|')[isFrontTires ? 0 : 1].Split('R')
+                    : FactoryTireSize.Split('R');
+
+                string[] WheelSizes2 = WheelSizes[0].Split('/');
+                int WheelSize = Int32.Parse(WheelSizes[1]);
+                int WheelWidth = Int32.Parse(WheelSizes2[0]);
+                int WheelProfile = Int32.Parse(WheelSizes2[1]);
+
+                WheelData wheel = new WheelData
                 {
-                    string[] WheelSizes = CarDefaultWheel.Split('|')[0].Split('R');
-
-                    WheelData wheel = new WheelData
-                    {
-                        Size = Int32.Parse(WheelSizes[1])
-                    };
-                    WheelSizes = CarDefaultWheel.Split('/');
-                    wheel.Width = Int32.Parse(WheelSizes[0]);
-
-                    string[] wheelsizes2 = CarDefaultWheel.Split('|');
-                    wheelsizes2 = wheelsizes2[0].Split('R');
-                    wheelsizes2 = wheelsizes2[0].Split('/');
-
-                    wheel.Profile = Int32.Parse(wheelsizes2[1]);
-                    item.WheelData = wheel;
-                }
-                else
-                {
-                    string[] wheelsizes = CarDefaultWheel.Split('R');
-                    WheelData wheel = new WheelData
-                    {
-                        Size = Int32.Parse(wheelsizes[1])
-                    };
-                    wheelsizes = CarDefaultWheel.Split('/');
-                    wheel.Width = Int32.Parse(wheelsizes[0]);
-                    string[] wheelsizes2 = wheelsizes[1].Split('R');
-                    wheel.Profile = Int32.Parse(wheelsizes2[0]);
-                    item.WheelData = wheel;
-                }
+                    Size = WheelSize,
+                    Width = WheelWidth,
+                    Profile = WheelProfile
+                };
+                item.WheelData = wheel;
+                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemId, WheelWidth, WheelProfile, WheelSize));
             }
 
             // Check if Player has enough money
@@ -205,6 +190,66 @@ namespace QuickShop
             // Buy item and charge player
             inventory.Add(item, true);
             GlobalData.AddPlayerMoney(-FinalPrice);
+        }
+
+        // This is certainly not the best way to do this but I can't find a better way to do this :shrug:
+        bool IsFocusedWheelFront()
+        {
+            float partX = GameScript.Get().GetPartMouseOver().GetNextMountObject().position.x;
+            float partZ = GameScript.Get().GetPartMouseOver().GetNextMountObject().position.z;
+
+            //MelonLogger.Msg($"X: {partX}, Z: {partZ}");
+
+            // Car Lift A, B
+            if (partZ < 2 && partZ > -1 && partX < 7 && partX > -1)
+            {
+                if (partZ < 0) return true;
+                else return false;
+            }
+
+            // Garage Entrance A, B
+            if (partZ < 16 && partZ > 12 && partX < 7 && partX > -1)
+            {
+                if (partZ < 13) return true;
+                else return false;
+            }
+
+            // Garage Entrance C
+            if (partZ < 14 && partZ > 11 && partX < 16 && partX > 11)
+            {
+                if (partX < 13) return true;
+                else return false;
+            }
+
+            // Car Wash
+            if (partZ < -33 && partZ > -38 && partX < 11 && partX > 8)
+            {
+                if (partZ < -36) return true;
+                else return false;
+            }
+
+            // Dyno
+            if (partZ < -30 && partZ > -34 && partX < 23 && partX > 20)
+            {
+                if (partZ < -32) return true;
+                else return false;
+            }
+
+            // Paintshop
+            if (partZ < -36 && partZ > -41 && partX < -6 && partX > -9)
+            {
+                if (partZ < -38) return true;
+                else return false;
+            }
+
+            // Test Path
+            if (partZ < -28 && partZ > -33 && partX < -19 && partX > -22)
+            {
+                if (partZ < -31) return true;
+                else return false;
+            }
+
+            return true;
         }
     }
 }
