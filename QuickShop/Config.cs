@@ -14,11 +14,29 @@ namespace QuickShop
         // Config
         public KeyCode BuyKeyCode => _buyKeyCode.Value;
         public KeyCode BuyTunedKeyCode => _buyTunedKeyCode.Value;
-        public int PriceDiscount => _priceDiscount.Value;
+        public int PriceDiscount
+        {
+            get
+            {
+                if (_priceDiscount.Value < 0) return 0;
+                if (_priceDiscount.Value > 100) return 100;
+                return _priceDiscount.Value;
+            }
+        }
         public bool BuyAdditionalParts => _buyAdditionalParts.Value;
         public bool BuyNormalPartIfTunedPartDoesntExist => _buyNormalPartIfTunedPartDoesntExist.Value;
         public bool DisableWarningMessage => _disableWarningMessage.Value;
         public bool AlwaysBuyTunedPart => _alwaysBuyTunedPart.Value;
+        public string LicensePlateType => _licensePlateType.Value;
+        public string LicensePlateText
+        {
+            get
+            {
+                if (_licensePlateText.Value.Length < 1) return "Quick123";
+                if (_licensePlateText.Value.Length > 8) return "Quick123";
+                return _licensePlateText.Value;
+            }
+        }
 
         // Parts
         public List<RequiredPart> RequiredParts => _requiredParts;
@@ -32,6 +50,8 @@ namespace QuickShop
         private readonly MelonPreferences_Entry<bool> _buyNormalPartIfTunedPartDoesntExist;
         private readonly MelonPreferences_Entry<bool> _disableWarningMessage;
         private readonly MelonPreferences_Entry<bool> _alwaysBuyTunedPart;
+        private readonly MelonPreferences_Entry<string> _licensePlateType;
+        private readonly MelonPreferences_Entry<string> _licensePlateText;
 
         // Parts
         private List<RequiredPart> _requiredParts;
@@ -49,6 +69,8 @@ namespace QuickShop
             _buyNormalPartIfTunedPartDoesntExist = _config.CreateEntry(nameof(BuyNormalPartIfTunedPartDoesntExist), false);
             _disableWarningMessage = _config.CreateEntry(nameof(DisableWarningMessage), false);
             _alwaysBuyTunedPart = _config.CreateEntry(nameof(AlwaysBuyTunedPart), false);
+            _licensePlateType = _config.CreateEntry(nameof(LicensePlateType), "Standard");
+            _licensePlateText = _config.CreateEntry(nameof(LicensePlateText), "Quick123");
 
             // Parts
             if (!File.Exists("Mods/QuickShop_parts.json"))

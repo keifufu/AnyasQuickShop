@@ -1,13 +1,7 @@
 ﻿using MelonLoader;
 using UnityEngine;
 
-/**
- * TODO: Make purchasing body parts possible.
- * We can get the name of the part (ex: 'front_window', 'hood'...) by using
- * `MelonLogger.Msg(GameScript.Get().GetIOMouseOverCarLoader().GetIDWithTuned());`
- */
-
-[assembly: MelonInfo(typeof(QuickShop.QuickShop), "QuickShop", "0.1.0", "keifufu")]
+[assembly: MelonInfo(typeof(QuickShop.QuickShop), "QuickShop", "0.2.0", "keifufu")]
 [assembly: MelonGame("Red Dot Games", "Car Mechanic Simulator 2021")]
 namespace QuickShop
 {
@@ -34,19 +28,19 @@ namespace QuickShop
 
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
-                UIManager.Get().ShowInfoWindow(GameScript.Get().GetPartMouseOver().GetID() + "\n" + GameScript.Get().GetPartMouseOver().GetTunedID());
+                string PartId = GameScript.Get().GetPartMouseOver()?.GetID();
+                string TunedId = GameScript.Get().GetPartMouseOver()?.GetTunedID();
+                if (PartId == "" || PartId == null || TunedId == "" || TunedId == null) return; 
+                UIManager.Get().ShowInfoWindow($"{PartId}\n{TunedId}");
                 return;
             }
 
-            if (Input.GetKeyDown(_config.BuyKeyCode))
+            if (Input.GetKeyDown(_config.BuyKeyCode) || Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
-                string ItemId = GameScript.Get().GetPartMouseOver()?.GetID();
-                _inventoryHelper.BuyPart(ItemId, _config.AlwaysBuyTunedPart);
-            }
-
-            if (Input.GetKeyDown(_config.BuyTunedKeyCode)) {
-                string ItemId = GameScript.Get().GetPartMouseOver()?.GetID();
-                _inventoryHelper.BuyPart(ItemId, true);
+                bool buyTuned = Input.GetKeyDown(_config.BuyTunedKeyCode) || _config.AlwaysBuyTunedPart;
+                string PartId = GameScript.Get().GetPartMouseOver()?.GetID();
+                string ItemId = (PartId == "" || PartId == null) ? GameScript.Get().GetRaycastOnItemID() : PartId;
+                _inventoryHelper.BuyPart(ItemId, buyTuned);
             }
         }
     }
