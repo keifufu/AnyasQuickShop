@@ -1,4 +1,5 @@
 ﻿using System;
+using MelonLoader;
 
 namespace QuickShop
 {
@@ -12,13 +13,15 @@ namespace QuickShop
 
         private int CalculatePrice(string ItemId)
         {
-            int discount = _config.PriceDiscount;
-            if (discount < 0) discount = 0;
-            if (discount > 100) discount = 100;
-            int origPrice = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).Price;
-            decimal appliedDiscount = origPrice * ((100m - discount) / 100m);
-            decimal price = Math.Ceiling(appliedDiscount);
-            return Convert.ToInt32(price);
+            int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).Price;
+            return CalculateDiscount(price);
+        }
+
+        private int CalculateDiscount(int price)
+        {
+            decimal appliedDiscount = price * ((100m - _config.PriceDiscount) / 100m);
+            decimal discounted = Math.Ceiling(appliedDiscount);
+            return Convert.ToInt32(discounted);
         }
 
         private bool TunedPartExists(string ItemId)
@@ -71,7 +74,6 @@ namespace QuickShop
                 }
             }
 
-            // Calculate price of main item
             int FinalPrice = CalculatePrice(ItemId);
             Item item = ItemFromID(ItemId);
 
@@ -94,6 +96,20 @@ namespace QuickShop
                         FinalPrice += CalculatePrice(additionalPartId);
                     }
                 }
+            }
+
+            // Create license plate
+            if (ItemId.Contains("license"))
+            {
+                LPData w = new LPData
+                {
+                    Name = _config.LicensePlateType,
+                    Custom = _config.LicensePlateText
+                };
+                item.LPData = w;
+                item.ID = "LicensePlate";
+                // Apply Fixed price for License Plate
+                FinalPrice += CalculateDiscount(100);
             }
 
             // Calculate rim data

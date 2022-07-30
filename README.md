@@ -23,9 +23,12 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 | BuyNormalPartIfTunedPartDoesntExist  | false | Self explanatory |
 | DisableWarningMessage | false | Disables "No tuned part was found, buying normal part instead." Message for the setting above |
 | AlwaysBuyTunedPart  | false | Buys a tuned part if possible by using either Hotkey |
+| LicensePlateType  | Standard | Type of the License Plate (Ex: Alaska, Greece, etc.) |
+| LicensePlateText  | Quick123 | Text on the License Plate |
 
 ## TODO
- - [ ] Make purchasing body parts possible
+ - [x] Make purchasing body parts possible
+ - [ ] Add price calculation for rims and tires
 
 ## QuickShop_parts.json:
 Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
