@@ -37,6 +37,19 @@ namespace QuickShop
                 return _licensePlateText.Value;
             }
         }
+        public int RimET
+        {
+            get
+            {
+                if (_rimEt.Value < 0) return 0;
+                if (_rimEt.Value > 50) return 50;
+                if ((_rimEt.Value % 5) == 0) return _rimEt.Value;
+                return 0;
+            }
+        }
+        public int PurchasePresetCtrl => _purchasePresetCtrl.Value;
+        public int PurchasePresetShift => _purchasePresetShift.Value;
+        public int PurchasePresetSpace => _purchasePresetSpace.Value;
 
         // Parts
         public List<RequiredPart> RequiredParts => _requiredParts;
@@ -52,6 +65,10 @@ namespace QuickShop
         private readonly MelonPreferences_Entry<bool> _alwaysBuyTunedPart;
         private readonly MelonPreferences_Entry<string> _licensePlateType;
         private readonly MelonPreferences_Entry<string> _licensePlateText;
+        private readonly MelonPreferences_Entry<int> _rimEt;
+        private readonly MelonPreferences_Entry<int> _purchasePresetCtrl;
+        private readonly MelonPreferences_Entry<int> _purchasePresetShift;
+        private readonly MelonPreferences_Entry<int> _purchasePresetSpace;
 
         // Parts
         private List<RequiredPart> _requiredParts;
@@ -71,6 +88,10 @@ namespace QuickShop
             _alwaysBuyTunedPart = _config.CreateEntry(nameof(AlwaysBuyTunedPart), false);
             _licensePlateType = _config.CreateEntry(nameof(LicensePlateType), "Standard");
             _licensePlateText = _config.CreateEntry(nameof(LicensePlateText), "Quick123");
+            _rimEt = _config.CreateEntry(nameof(RimET), 0);
+            _purchasePresetCtrl = _config.CreateEntry(nameof(PurchasePresetCtrl), 4);
+            _purchasePresetShift = _config.CreateEntry(nameof(PurchasePresetShift), 8);
+            _purchasePresetSpace = _config.CreateEntry(nameof(PurchasePresetSpace), 16);
 
             // Parts
             if (!File.Exists("Mods/QuickShop_parts.json"))

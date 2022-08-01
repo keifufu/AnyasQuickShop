@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MelonLoader;
 
 namespace QuickShop
@@ -11,23 +12,27 @@ namespace QuickShop
             _config = config;
         }
 
-        private int CalculatePrice(string ItemId)
+        private int CalculatePrice(string ItemId, int itemAmount)
         {
             if (ItemId.Contains("rim_") || ItemId.Contains("tire_")) return 0;
             int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).Price;
-            return CalculateDiscount(price);
+            return CalculateDiscount(price, itemAmount);
         }
 
-        private int CalculateDiscount(int price)
+        private int CalculateDiscount(int price, int itemAmount = 1)
         {
             decimal appliedDiscount = price * ((100m - _config.PriceDiscount) / 100m);
             decimal discounted = Math.Ceiling(appliedDiscount);
-            return Convert.ToInt32(discounted);
+            return Convert.ToInt32(discounted) * itemAmount;
         }
 
         private bool TunedPartExists(string ItemId)
         {
             if (ItemId == "" || ItemId == null || ItemId == "t_") return false;
+
+            // Tuned break discs
+            if (ItemId.Contains("tarczaWentylowana")) return true;
+
             if (!ItemId.StartsWith("t_"))
                 ItemId = $"t_{ItemId}";
 
@@ -47,12 +52,13 @@ namespace QuickShop
             return item;
         }
 
-        public void BuyPart(string ItemId, bool buyTuned = false)
+        public void BuyPart(string ItemId, bool buyTuned, int itemAmount)
         {
             if (ItemId == "" || ItemId == "t_" || ItemId == null) return;
 
             var inventory = Singleton<Inventory>.Instance;
             var uiManager = UIManager.Get();
+            List<AdditionalItem> additionalItems = new List<AdditionalItem>();
 
             // Check if a tuned variant exists and change itemId accordingly
             if (buyTuned)
@@ -71,14 +77,18 @@ namespace QuickShop
                 }
                 else
                 {
-                    ItemId = $"t_{ItemId}";
+                    // Tuned ItemId for brake discs
+                    if (ItemId.Contains("tarczaWentylowana"))
+                        ItemId = "tarczaWentylowana_5";
+                    else
+                        ItemId = $"t_{ItemId}";
                 }
             }
 
-            int FinalPrice = CalculatePrice(ItemId);
+            int FinalPrice = CalculatePrice(ItemId, itemAmount);
             Item item = ItemFromID(ItemId);
 
-            // Calculate Price of additional items
+            // Calculate additional Items and their price
             if (_config.BuyAdditionalParts)
             {
                 for (int i = 0; i < _config.RequiredParts.Count; i++)
@@ -90,11 +100,21 @@ namespace QuickShop
                     string[] AdditionalParts = part.AdditionalParts.Split(',');
                     foreach (string additionalPart in AdditionalParts)
                     {
+                        // Get ItemId
                         string additionalPartId = additionalPart;
                         if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
+                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_") && !additionalPartId.Contains("tarczaWentyIowana"))
                             additionalPartId = $"t_{additionalPartId}";
-                        FinalPrice += CalculatePrice(additionalPartId);
+
+                        // Add item to additionalItems
+                        AdditionalItem additionalItem = additionalItems.Find(x => x.ItemId == additionalPartId);
+                        if (additionalItem != null)
+                            additionalItem.amount += itemAmount;
+                        else
+                            additionalItems.Add(new AdditionalItem { ItemId = additionalPartId, amount = itemAmount });
+                        
+                        // Calculate Price
+                        FinalPrice += CalculatePrice(additionalPartId, itemAmount);
                     }
                 }
             }
@@ -110,7 +130,7 @@ namespace QuickShop
                 item.LPData = licensePlate;
                 item.ID = "LicensePlate";
                 // Apply Fixed price for License Plate
-                FinalPrice += CalculateDiscount(100);
+                FinalPrice += CalculateDiscount(100, itemAmount);
             }
 
             // Calculate rim data and price
@@ -123,14 +143,15 @@ namespace QuickShop
                     ? FactoryTireSize.Split('|')[isFrontTires ? 0 : 1].Split('R')
                     : FactoryTireSize.Split('R');
 
-                int WheelSize = Int32.Parse(WheelSizes[1]);
+                int WheelSize = int.Parse(WheelSizes[1]);
 
                 WheelData wheel = new WheelData
                 {
-                    Size = WheelSize
+                    Size = WheelSize,
+                    ET = _config.RimET
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemId, WheelSize, 0));
+                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemId, WheelSize, _config.RimET), itemAmount);
             }
 
             // Calculate tire data and price
@@ -144,9 +165,9 @@ namespace QuickShop
                     : FactoryTireSize.Split('R');
 
                 string[] WheelSizes2 = WheelSizes[0].Split('/');
-                int WheelSize = Int32.Parse(WheelSizes[1]);
-                int WheelWidth = Int32.Parse(WheelSizes2[0]);
-                int WheelProfile = Int32.Parse(WheelSizes2[1]);
+                int WheelSize = int.Parse(WheelSizes[1]);
+                int WheelWidth = int.Parse(WheelSizes2[0]);
+                int WheelProfile = int.Parse(WheelSizes2[1]);
 
                 WheelData wheel = new WheelData
                 {
@@ -155,7 +176,7 @@ namespace QuickShop
                     Profile = WheelProfile
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemId, WheelWidth, WheelProfile, WheelSize));
+                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemId, WheelWidth, WheelProfile, WheelSize), itemAmount);
             }
 
             // Check if Player has enough money
@@ -166,29 +187,21 @@ namespace QuickShop
             }
 
             // Buy additional items
-            if (_config.BuyAdditionalParts)
+            foreach (AdditionalItem _additionalItem in additionalItems)
             {
-                for (int i = 0; i < _config.RequiredParts.Count; i++)
-                {
-                    RequiredPart part = _config.RequiredParts[i];
-                    if (!part.Enabled) continue;
-                    if (!ItemId.Equals(part.MainPart) && !ItemId.Replace("t_", "").Equals(part.MainPart)) continue;
-                    if (part.AdditionalParts == "" || part.AdditionalParts == null) continue;
-                    string[] AdditionalParts = part.AdditionalParts.Split(',');
-                    foreach (string additionalPart in AdditionalParts)
-                    {
-                        string additionalPartId = additionalPart;
-                        if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_"))
-                            additionalPartId = $"t_{additionalPartId}";
-                        Item additionalItem = ItemFromID(additionalPartId);
-                        inventory.Add(additionalItem, true);
-                    }
-                }
+                Item additionalItem = ItemFromID(_additionalItem.ItemId);
+                for (int i = 0; i < _additionalItem.amount; i++)
+                    inventory.Add(additionalItem);
+
+                string _messageAddon = _additionalItem.amount > 1 ? $" x{_additionalItem.amount}" : "";
+                uiManager.ShowPopup(Config.ModName, $"Added {additionalItem.GetLocalizedName()}{_messageAddon}", PopupType.Buy);
             }
 
             // Buy item and charge player
-            inventory.Add(item, true);
+            for (int i = 0; i < itemAmount; i++)
+                inventory.Add(item);
+            string messageAddon = itemAmount > 1 ? $" x{itemAmount}" : "";
+            uiManager.ShowPopup(Config.ModName, $"Added {item.GetLocalizedName()}{messageAddon}", PopupType.Buy);
             GlobalData.AddPlayerMoney(-FinalPrice);
         }
 
@@ -250,6 +263,12 @@ namespace QuickShop
             }
 
             return true;
+        }
+
+        public class AdditionalItem
+        {
+            public string ItemId;
+            public int amount;
         }
     }
 }
