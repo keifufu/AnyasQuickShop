@@ -103,8 +103,10 @@ namespace QuickShop
                         // Get ItemId
                         string additionalPartId = additionalPart;
                         if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_") && !additionalPartId.Contains("tarczaWentyIowana"))
+                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_") && !additionalPartId.Contains("tarczaWentylowana"))
                             additionalPartId = $"t_{additionalPartId}";
+                        if (buyTuned && additionalPartId.Contains("tarczaWentylowana"))
+                            additionalPartId = "tarczaWentylowana_5";
 
                         // Add item to additionalItems
                         AdditionalItem additionalItem = additionalItems.Find(x => x.ItemId == additionalPartId);
