@@ -10,8 +10,11 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 ## Keybinds
 - **B** - Buy Part
 - **N** - Buy Tuned Part
-- **CTRL + B** - Reload Config
-- **CTRL + N** - Show ID of hovered part
+- **Ctrl + (Key)** - Buy Part x4
+- **Shift + (Key)** - Buy Part x8
+- **Space + (Key)** - Buy Part x16
+- **Alt + B** - Reload Config
+- **Alt + N** - Show ID of hovered part
 
 ## Config
 | Name | Default | Description |
@@ -22,15 +25,21 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 | BuyAdditionalParts | true | Whether to buy required parts (Ex: When buying a Piston, it buys Piston Rings) |
 | BuyNormalPartIfTunedPartDoesntExist  | false | Self explanatory |
 | DisableWarningMessage | false | Disables "No tuned part was found, buying normal part instead." Message for the setting above |
-| AlwaysBuyTunedPart  | false | Buys a tuned part if possible by using either Hotkey |
-| LicensePlateType  | Standard | Type of the License Plate (Ex: Alaska, Greece, etc.) |
-| LicensePlateText  | Quick123 | Text on the License Plate |
+| AlwaysBuyTunedPart | false | Buys a tuned part if possible by using either Hotkey |
+| LicensePlateType | Standard | Type of the License Plate (Ex: Alaska, Greece, etc.) |
+| LicensePlateText | Quick123 | Text on the License Plate |
+| RimET | 0 | ET on purchased Rims |
+| PurchasePresetCtrl | 4 | How many parts to buy when holding Ctrl |
+| PurchasePresetShift | 8 | How many parts to buy when holding Shift |
+| PurchasePresetSpace | 16 | How many parts to buy when holding Space |
 
 ## TODO
  - [x] Make purchasing body parts possible
  - [x] Add price calculation for rims and tires
  - [x] Purchase correct rim and tire size on cars with multiple wheel sizes
- - [ ] Add ET option to config
+ - [x] Add Rim ET option to config
+ - [x] Fix not being able to buy tuned brake disc
+ - [x] Add modifier keys to purchase multiple items at once (Thanks to [DefilerOfFate](https://www.nexusmods.com/users/82238008) for the suggestion)
 
 ## QuickShop_parts.json
 - Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
