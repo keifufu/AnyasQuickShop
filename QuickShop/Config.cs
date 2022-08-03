@@ -97,19 +97,19 @@ namespace QuickShop
             if (!File.Exists("Mods/QuickShop_parts.json"))
                 CreatePartsFile();
             string jsonString = File.ReadAllText("Mods/QuickShop_parts.json");
-            _requiredParts = JsonConvert.DeserializeObject<ListRequiredParts>(jsonString).RequiredParts;
+            _requiredParts = JsonConvert.DeserializeObject<RequiredPartsList>(jsonString).RequiredParts;
         }
 
         public void Reload()
         {
             _config.LoadFromFile();
             string jsonString = File.ReadAllText("Mods/QuickShop_parts.json");
-            _requiredParts = JsonConvert.DeserializeObject<ListRequiredParts>(jsonString).RequiredParts;
+            _requiredParts = JsonConvert.DeserializeObject<RequiredPartsList>(jsonString).RequiredParts;
         }
 
         private void CreatePartsFile()
         {
-            List<RequiredPart> listparts = new List<RequiredPart>
+            List<RequiredPart> partsList= new List<RequiredPart>
             {
                 new RequiredPart
                 {
@@ -323,9 +323,9 @@ namespace QuickShop
                 }
             };
 
-            ListRequiredParts jsonparts = new ListRequiredParts
+            RequiredPartsList jsonparts = new RequiredPartsList
             {
-                RequiredParts = listparts
+                RequiredParts = partsList
             };
 
             using (var file = File.CreateText("Mods/QuickShop_parts.json"))
@@ -347,7 +347,7 @@ namespace QuickShop
         public bool Enabled { get; set; }
     }
 
-    public class ListRequiredParts
+    public class RequiredPartsList
     {
         public List<RequiredPart> RequiredParts { get; set; }
     }

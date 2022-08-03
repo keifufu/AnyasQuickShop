@@ -22,25 +22,25 @@ namespace QuickShop
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(_config.BuyKeyCode))
             {
                 _config.Reload();
-                UIManager.Get().ShowInfoWindow("[QuickShop] Config has been reloaded");
+                UIManager.Get().ShowPopup(Config.ModName, "Reloaded Config", PopupType.Normal);
                 return;
             }
 
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
-                string PartId = GameScript.Get().GetPartMouseOver()?.GetID();
-                string TunedId = GameScript.Get().GetPartMouseOver()?.GetTunedID();
-                if ((PartId == "" || PartId == null) && (TunedId == "" || TunedId == null)) return; 
-                UIManager.Get().ShowInfoWindow($"{PartId}\n{TunedId}");
+                string PartID = GameScript.Get().GetPartMouseOver()?.GetID();
+                string TunedID = GameScript.Get().GetPartMouseOver()?.GetTunedID();
+                if ((PartID == "" || PartID == null) && (TunedID == "" || TunedID == null)) return; 
+                UIManager.Get().ShowInfoWindow($"{PartID}\n{TunedID}");
                 return;
             }
 
             if (Input.GetKeyDown(_config.BuyKeyCode) || Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
                 bool buyTuned = Input.GetKeyDown(_config.BuyTunedKeyCode) || _config.AlwaysBuyTunedPart;
-                string PartId = GameScript.Get().GetPartMouseOver()?.GetID();
-                string ItemId = (PartId == "" || PartId == null) ? GameScript.Get().GetRaycastOnItemID() : PartId;
-                _inventoryHelper.BuyPart(ItemId, buyTuned, GetItemAmount());
+                string PartID = GameScript.Get().GetPartMouseOver()?.GetID();
+                string ItemID = (PartID == "" || PartID == null) ? GameScript.Get().GetRaycastOnItemID() : PartID;
+                _inventoryHelper.BuyPart(ItemID, buyTuned, GetItemAmount());
             }
         }
 
