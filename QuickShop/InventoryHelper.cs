@@ -12,10 +12,19 @@ namespace QuickShop
             _config = config;
         }
 
-        private int CalculatePrice(string ItemId, int itemAmount)
+        private class AdditionalItem
         {
-            if (ItemId.Contains("rim_") || ItemId.Contains("tire_")) return 0;
-            int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).Price;
+            public string ItemID;
+            public int amount;
+        }
+
+        private int CalculatePrice(string ItemID, int itemAmount)
+        {
+            // Return 0 on rims and tires since their price calculation is handled in `BuyPart`
+            if (ItemID.Contains("rim_") || ItemID.Contains("tire_")) return 0;
+            int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemID).Price;
+            // License plate IDs are weird and their price is always 100
+            if (ItemID.Contains("license_")) price = 100;
             return CalculateDiscount(price, itemAmount);
         }
 
@@ -26,103 +35,105 @@ namespace QuickShop
             return Convert.ToInt32(discounted) * itemAmount;
         }
 
-        private bool TunedPartExists(string ItemId)
+        private bool TunedPartExists(string ItemID)
         {
-            if (ItemId == "" || ItemId == null || ItemId == "t_") return false;
+            // Tuned break discs don't use t_(ItemID) and we know they exist
+            if (ItemID.Contains("tarczaWentylowana")) return true;
 
-            // Tuned break discs
-            if (ItemId.Contains("tarczaWentylowana")) return true;
-
-            if (!ItemId.StartsWith("t_"))
-                ItemId = $"t_{ItemId}";
-
-            // `LocalizedName` defaults to `ItemId` if the Item does not exist.
-            var Exists = Singleton<GameInventory>.Instance.GetItemProperty(ItemId).LocalizedName != ItemId;
-            return Exists;
+            // `LocalizedName` defaults to `ItemID` if the Item does not exist.
+            ItemID = $"t_{ItemID}";
+            return Singleton<GameInventory>.Instance.GetItemProperty(ItemID).LocalizedName != ItemID;
         }
 
-        public static Item ItemFromID(string ItemId)
+        private string GetTunedItemIDIfExists(string ItemID)
+        {
+            if (ItemID.StartsWith("t_")) ItemID = ItemID.Replace("t_", "");
+            if (!TunedPartExists(ItemID)) return ItemID;
+
+            if (ItemID.Contains("tarczaWentylowana")) return "tarczaWentylowana_5";
+            return $"t_{ItemID}";
+        }
+
+        private Item ItemFromID(string ItemID)
         {
             Item item = new Item
             {
-                ID = ItemId
+                ID = ItemID
             };
             item.MakeNewUID();
 
             return item;
         }
 
-        public void BuyPart(string ItemId, bool buyTuned, int itemAmount)
+        public void BuyPart(string ItemID, bool buyTuned, int itemAmount)
         {
-            if (ItemId == "" || ItemId == "t_" || ItemId == null) return;
+            if (ItemID == "" || ItemID == null) return;
 
             var inventory = Singleton<Inventory>.Instance;
             var uiManager = UIManager.Get();
+            // List of additional items to buy (Ex: Piston Rings)
             List<AdditionalItem> additionalItems = new List<AdditionalItem>();
 
-            // Check if a tuned variant exists and change itemId accordingly
             if (buyTuned)
             {
-                if (!TunedPartExists(ItemId))
+                // If no tuned variant exists and we don't always buy tuned parts, notify the player.
+                if (!TunedPartExists(ItemID) && !_config.AlwaysBuyTunedPart)
                 {
-                    if (!_config.BuyNormalPartIfTunedPartDoesntExist && !_config.AlwaysBuyTunedPart)
+                    // Notify the player that no tuned part could be found and return
+                    if (!_config.BuyNormalPartIfTunedPartDoesntExist)
                     {
-                        uiManager.ShowPopup(Config.ModName, "No tuned part was found.", PopupType.Normal);
+                        uiManager.ShowPopup(Config.ModName, "No tuned part was found", PopupType.Normal);
                         return;
                     }
-                    else if (!_config.DisableWarningMessage && !_config.AlwaysBuyTunedPart)
+                    // Notify the player that a normal part will be bought instead
+                    else if (!_config.DisableWarningMessage)
                     {
-                        uiManager.ShowPopup(Config.ModName, "No tuned part was found, buying normal part instead.", PopupType.Buy);
+                        uiManager.ShowPopup(Config.ModName, "No tuned part was found, buying normal part instead", PopupType.Buy);
                     }
                 }
-                else
-                {
-                    // Tuned ItemId for brake discs
-                    if (ItemId.Contains("tarczaWentylowana"))
-                        ItemId = "tarczaWentylowana_5";
-                    else
-                        ItemId = $"t_{ItemId}";
-                }
+
+                // Change ItemID to a tuned ID if a tuned variant exists
+                ItemID = GetTunedItemIDIfExists(ItemID);
             }
 
-            int FinalPrice = CalculatePrice(ItemId, itemAmount);
-            Item item = ItemFromID(ItemId);
+            // Calculate price of the main item
+            int FinalPrice = CalculatePrice(ItemID, itemAmount);
+            Item item = ItemFromID(ItemID);
 
-            // Calculate additional Items and their price
+            // Calculate additional items and their price
             if (_config.BuyAdditionalParts)
             {
                 for (int i = 0; i < _config.RequiredParts.Count; i++)
                 {
                     RequiredPart part = _config.RequiredParts[i];
                     if (!part.Enabled) continue;
-                    if (!ItemId.Equals(part.MainPart) && !ItemId.Replace("t_", "").Equals(part.MainPart)) continue;
+                    if (!ItemID.Equals(part.MainPart) && !ItemID.Replace("t_", "").Equals(part.MainPart)) continue;
                     if (part.AdditionalParts == "" || part.AdditionalParts == null) continue;
                     string[] AdditionalParts = part.AdditionalParts.Split(',');
-                    foreach (string additionalPart in AdditionalParts)
+                    foreach (string _additionalPartId in AdditionalParts)
                     {
-                        // Get ItemId
-                        string additionalPartId = additionalPart;
-                        if (additionalPartId == "" || additionalPartId == null) continue;
-                        if (buyTuned && TunedPartExists(additionalPartId) && !additionalPartId.StartsWith("t_") && !additionalPartId.Contains("tarczaWentylowana"))
-                            additionalPartId = $"t_{additionalPartId}";
-                        if (buyTuned && additionalPartId.Contains("tarczaWentylowana"))
-                            additionalPartId = "tarczaWentylowana_5";
+                        if (_additionalPartId == "" || _additionalPartId == null) continue;
+                        string additionalPartId = buyTuned ? GetTunedItemIDIfExists(_additionalPartId) : _additionalPartId;
 
                         // Add item to additionalItems
-                        AdditionalItem additionalItem = additionalItems.Find(x => x.ItemId == additionalPartId);
+                        AdditionalItem additionalItem = additionalItems.Find(x => x.ItemID == additionalPartId);
                         if (additionalItem != null)
-                            additionalItem.amount += itemAmount;
+                        {
+                           additionalItem.amount += itemAmount;
+                        }
                         else
-                            additionalItems.Add(new AdditionalItem { ItemId = additionalPartId, amount = itemAmount });
+                        {
+                            additionalItems.Add(new AdditionalItem { ItemID = additionalPartId, amount = itemAmount });
+                        }
                         
-                        // Calculate Price
+                        // Calculate price
                         FinalPrice += CalculatePrice(additionalPartId, itemAmount);
                     }
                 }
             }
 
             // Create license plate
-            if (ItemId.Contains("license_"))
+            if (ItemID.Contains("license_"))
             {
                 LPData licensePlate = new LPData
                 {
@@ -131,15 +142,13 @@ namespace QuickShop
                 };
                 item.LPData = licensePlate;
                 item.ID = "LicensePlate";
-                // Apply Fixed price for License Plate
-                FinalPrice += CalculateDiscount(100, itemAmount);
             }
 
             // Calculate rim data and price
-            if (ItemId.Contains("rim_"))
+            if (ItemID.Contains("rim_"))
             {
                 string FactoryTireSize = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
-                bool isFrontTires = IsFocusedWheelFront();
+                bool isFrontTires = IsFocusedOnFrontWheel();
 
                 string[] WheelSizes = (FactoryTireSize.Contains("|"))
                     ? FactoryTireSize.Split('|')[isFrontTires ? 0 : 1].Split('R')
@@ -153,14 +162,14 @@ namespace QuickShop
                     ET = _config.RimET
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemId, WheelSize, _config.RimET), itemAmount);
+                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemID, WheelSize, _config.RimET), itemAmount);
             }
 
             // Calculate tire data and price
-            if (ItemId.Contains("tire_"))
+            if (ItemID.Contains("tire_"))
             {
                 string FactoryTireSize = GameScript.Get().GetIOMouseOverCarLoader2().GetFrontTireSize();
-                bool isFrontTires = IsFocusedWheelFront();
+                bool isFrontTires = IsFocusedOnFrontWheel();
 
                 string[] WheelSizes = (FactoryTireSize.Contains("|"))
                     ? FactoryTireSize.Split('|')[isFrontTires ? 0 : 1].Split('R')
@@ -178,42 +187,45 @@ namespace QuickShop
                     Profile = WheelProfile
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemId, WheelWidth, WheelProfile, WheelSize), itemAmount);
+                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemID, WheelWidth, WheelProfile, WheelSize), itemAmount);
             }
 
-            // Check if Player has enough money
+            // Check if the player can afford the parts
             if (GlobalData.PlayerMoney < FinalPrice)
             {
                 uiManager.ShowPopup(Config.ModName, $"Not enought money! ({GlobalData.PlayerMoney} < {FinalPrice})", PopupType.Buy);
                 return;
             }
 
-            // Buy additional items
+            // Add additional items to inventory
             foreach (AdditionalItem _additionalItem in additionalItems)
             {
-                Item additionalItem = ItemFromID(_additionalItem.ItemId);
+                Item additionalItem = ItemFromID(_additionalItem.ItemID);
                 for (int i = 0; i < _additionalItem.amount; i++)
                     inventory.Add(additionalItem);
 
-                string _messageAddon = _additionalItem.amount > 1 ? $" x{_additionalItem.amount}" : "";
-                uiManager.ShowPopup(Config.ModName, $"Added {additionalItem.GetLocalizedName()}{_messageAddon}", PopupType.Buy);
+                string _itemAmountString = _additionalItem.amount > 1 ? $" x{_additionalItem.amount}" : "";
+                uiManager.ShowPopup(Config.ModName, $"Added {additionalItem.GetLocalizedName()}{_itemAmountString}", PopupType.Buy);
             }
 
-            // Buy item and charge player
+            // Add main item to inventory and charge player
             for (int i = 0; i < itemAmount; i++)
                 inventory.Add(item);
-            string messageAddon = itemAmount > 1 ? $" x{itemAmount}" : "";
-            uiManager.ShowPopup(Config.ModName, $"Added {item.GetLocalizedName()}{messageAddon}", PopupType.Buy);
+            string itemAmountString = itemAmount > 1 ? $" x{itemAmount}" : "";
+            uiManager.ShowPopup(Config.ModName, $"Added {item.GetLocalizedName()}{itemAmountString}", PopupType.Buy);
             GlobalData.AddPlayerMoney(-FinalPrice);
         }
 
-        // This is certainly not the best way to do this but I can't find a better way to do this :shrug:
-        bool IsFocusedWheelFront()
+        // This is most certainly not the best way to do this but I couldn't find a better way :shrug:
+        // This function exists to purchase the correct rim and tire sizes for cars with multiple wheel sizes.
+        // This compares coordinates to hard-coded ones, so I expect there to be issues in the future.
+        bool IsFocusedOnFrontWheel()
         {
             float partX = GameScript.Get().GetPartMouseOver().GetNextMountObject().position.x;
             float partZ = GameScript.Get().GetPartMouseOver().GetNextMountObject().position.z;
 
-            //MelonLogger.Msg($"X: {partX}, Z: {partZ}");
+            // Left here for debugging purposes
+            // MelonLogger.Msg($"X: {partX}, Z: {partZ}");
 
             // Car Lift A, B
             if (partZ < 2 && partZ > -1 && partX < 7 && partX > -1)
@@ -265,12 +277,6 @@ namespace QuickShop
             }
 
             return true;
-        }
-
-        public class AdditionalItem
-        {
-            public string ItemId;
-            public int amount;
         }
     }
 }
