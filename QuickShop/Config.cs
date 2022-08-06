@@ -50,6 +50,7 @@ namespace QuickShop
         public int PurchasePresetCtrl => _purchasePresetCtrl.Value;
         public int PurchasePresetShift => _purchasePresetShift.Value;
         public int PurchasePresetSpace => _purchasePresetSpace.Value;
+        public bool ShowPartCost => _showPartCost.Value;
 
         // Parts
         public List<RequiredPart> RequiredParts => _requiredParts;
@@ -69,6 +70,7 @@ namespace QuickShop
         private readonly MelonPreferences_Entry<int> _purchasePresetCtrl;
         private readonly MelonPreferences_Entry<int> _purchasePresetShift;
         private readonly MelonPreferences_Entry<int> _purchasePresetSpace;
+        private readonly MelonPreferences_Entry<bool> _showPartCost;
 
         // Parts
         private List<RequiredPart> _requiredParts;
@@ -92,6 +94,7 @@ namespace QuickShop
             _purchasePresetCtrl = _config.CreateEntry(nameof(PurchasePresetCtrl), 4);
             _purchasePresetShift = _config.CreateEntry(nameof(PurchasePresetShift), 8);
             _purchasePresetSpace = _config.CreateEntry(nameof(PurchasePresetSpace), 16);
+            _showPartCost = _config.CreateEntry(nameof(ShowPartCost), true);
 
             // Parts
             if (!File.Exists("Mods/QuickShop_parts.json"))
