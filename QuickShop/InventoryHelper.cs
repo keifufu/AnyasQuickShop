@@ -16,6 +16,7 @@ namespace QuickShop
         {
             public string ItemID;
             public int amount;
+            public int cost;
         }
 
         private int CalculatePrice(string ItemID, int itemAmount)
@@ -23,8 +24,6 @@ namespace QuickShop
             // Return 0 on rims and tires since their price calculation is handled in `BuyPart`
             if (ItemID.Contains("rim_") || ItemID.Contains("tire_")) return 0;
             int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemID).Price;
-            // License plate IDs are weird and their price is always 100
-            if (ItemID.Contains("license_")) price = 100;
             return CalculateDiscount(price, itemAmount);
         }
 
@@ -68,6 +67,7 @@ namespace QuickShop
         public void BuyPart(string ItemID, bool buyTuned, int itemAmount)
         {
             if (ItemID == "" || ItemID == null) return;
+            if (ItemID.Contains("license_")) ItemID = "LicensePlate";
 
             var inventory = Singleton<Inventory>.Instance;
             var uiManager = UIManager.Get();
@@ -97,6 +97,8 @@ namespace QuickShop
             }
 
             // Calculate price of the main item
+            // _MainPartPrice is used to show the amount in the popup
+            int _MainPartPrice = CalculatePrice(ItemID, itemAmount);
             int FinalPrice = CalculatePrice(ItemID, itemAmount);
             Item item = ItemFromID(ItemID);
 
@@ -115,19 +117,23 @@ namespace QuickShop
                         if (_additionalPartId == "" || _additionalPartId == null) continue;
                         string additionalPartId = buyTuned ? GetTunedItemIDIfExists(_additionalPartId) : _additionalPartId;
 
+                        // Calculate price
+                        int partCost = CalculatePrice(additionalPartId, itemAmount);
+
                         // Add item to additionalItems
                         AdditionalItem additionalItem = additionalItems.Find(x => x.ItemID == additionalPartId);
                         if (additionalItem != null)
                         {
                            additionalItem.amount += itemAmount;
+                           additionalItem.cost += partCost;
                         }
                         else
                         {
-                            additionalItems.Add(new AdditionalItem { ItemID = additionalPartId, amount = itemAmount });
+                            additionalItems.Add(new AdditionalItem { ItemID = additionalPartId, amount = itemAmount, cost = partCost });
                         }
-                        
+
                         // Calculate price
-                        FinalPrice += CalculatePrice(additionalPartId, itemAmount);
+                        FinalPrice += partCost;
                     }
                 }
             }
@@ -162,7 +168,9 @@ namespace QuickShop
                     ET = _config.RimET
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetRimPrice(ItemID, WheelSize, _config.RimET), itemAmount);
+                int partCost = CalculateDiscount(Helper.GetRimPrice(ItemID, WheelSize, _config.RimET), itemAmount);
+                FinalPrice += partCost;
+                _MainPartPrice = partCost;
             }
 
             // Calculate tire data and price
@@ -187,7 +195,9 @@ namespace QuickShop
                     Profile = WheelProfile
                 };
                 item.WheelData = wheel;
-                FinalPrice += CalculateDiscount(Helper.GetTirePrice(ItemID, WheelWidth, WheelProfile, WheelSize), itemAmount);
+                int partCost = CalculateDiscount(Helper.GetTirePrice(ItemID, WheelWidth, WheelProfile, WheelSize), itemAmount);
+                FinalPrice += partCost;
+                _MainPartPrice = partCost;
             }
 
             // Check if the player can afford the parts
@@ -205,6 +215,7 @@ namespace QuickShop
                     inventory.Add(additionalItem);
 
                 string _itemAmountString = _additionalItem.amount > 1 ? $" x{_additionalItem.amount}" : "";
+                string _costString = _config.ShowPartCost ? $" ({_additionalItem.cost} CR)" : "";
                 uiManager.ShowPopup(Config.ModName, $"Added {additionalItem.GetLocalizedName()}{_itemAmountString}", PopupType.Buy);
             }
 
@@ -212,7 +223,8 @@ namespace QuickShop
             for (int i = 0; i < itemAmount; i++)
                 inventory.Add(item);
             string itemAmountString = itemAmount > 1 ? $" x{itemAmount}" : "";
-            uiManager.ShowPopup(Config.ModName, $"Added {item.GetLocalizedName()}{itemAmountString}", PopupType.Buy);
+            string costString = _config.ShowPartCost ? $" ({_MainPartPrice} CR)" : "";
+            uiManager.ShowPopup(Config.ModName, $"Added {item.GetLocalizedName()}{itemAmountString}{costString}", PopupType.Buy);
             GlobalData.AddPlayerMoney(-FinalPrice);
         }
 

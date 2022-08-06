@@ -38,8 +38,7 @@ namespace QuickShop
             if (Input.GetKeyDown(_config.BuyKeyCode) || Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
                 bool buyTuned = Input.GetKeyDown(_config.BuyTunedKeyCode) || _config.AlwaysBuyTunedPart;
-                string PartID = GameScript.Get().GetPartMouseOver()?.GetID();
-                string ItemID = (PartID == "" || PartID == null) ? GameScript.Get().GetRaycastOnItemID() : PartID;
+                string ItemID = GameScript.Get().GetRaycastOnItemID();
                 _inventoryHelper.BuyPart(ItemID, buyTuned, GetItemAmount());
             }
         }
