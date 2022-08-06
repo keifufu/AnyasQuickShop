@@ -24,6 +24,8 @@ namespace QuickShop
             // Return 0 on rims and tires since their price calculation is handled in `BuyPart`
             if (ItemID.Contains("rim_") || ItemID.Contains("tire_")) return 0;
             int price = Singleton<GameInventory>.Instance.GetItemProperty(ItemID).Price;
+            // License plate IDs are weird and their price is always 100
+            if (ItemID.Contains("license_")) price = 100;
             return CalculateDiscount(price, itemAmount);
         }
 
@@ -67,7 +69,6 @@ namespace QuickShop
         public void BuyPart(string ItemID, bool buyTuned, int itemAmount)
         {
             if (ItemID == "" || ItemID == null) return;
-            if (ItemID.Contains("license_")) ItemID = "LicensePlate";
 
             var inventory = Singleton<Inventory>.Instance;
             var uiManager = UIManager.Get();
