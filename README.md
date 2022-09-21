@@ -46,7 +46,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 
 ## QuickShop_parts.json
 - Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
-- Ids can be figured out by using `CTRL + N`
+- Ids can be figured out by using `ALT + N`
 - If you're messing with this you probably know what you're doing anyway
 
 ## Credits
