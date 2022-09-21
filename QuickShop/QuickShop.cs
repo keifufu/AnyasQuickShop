@@ -28,10 +28,9 @@ namespace QuickShop
 
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(_config.BuyTunedKeyCode))
             {
-                string PartID = GameScript.Get().GetPartMouseOver()?.GetID();
-                string TunedID = GameScript.Get().GetPartMouseOver()?.GetTunedID();
-                if ((PartID == "" || PartID == null) && (TunedID == "" || TunedID == null)) return; 
-                UIManager.Get().ShowInfoWindow($"{PartID}\n{TunedID}");
+                string ItemID = GameScript.Get().GetRaycastOnItemID();
+                if (ItemID == "" || ItemID == null) return; 
+                UIManager.Get().ShowInfoWindow(ItemID);
                 return;
             }
 
