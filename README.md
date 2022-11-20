@@ -3,9 +3,9 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 
 ## Installation
 - Install Melon Loader (using [Melon Loader Automated Installer](https://melonwiki.xyz/#/?id=automated-installation))
-- Download the .dll [here](https://github.com/keifufu/QuickShop/releases/latest)
+- Download the .dll [here](https://github.com/keifufu/AnyasQuickShop/releases/latest)
 - Move the .dll into your Mods directory (GameFolder/Mods/)
-- (optional) Configure file created at (Mods/QuickShop.cfg)
+- (optional) Configure file created at (Mods/AnyasQuickShop.cfg)
 
 ## Keybinds
 - **B** - Buy Part
@@ -15,12 +15,15 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 - **Space + (Key)** - Buy Part x16
 - **Alt + B** - Reload Config
 - **Alt + N** - Show ID of hovered part
+- **Delete** - Unmount all body parts
+- **Home** - Buy all missing parts
 
 ## Config
 | Name | Default | Description |
 | --- | --- | --- |
 | BuyKeyCode | B | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html)  to buy a part |
 | BuyTunedKeyCode | N | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html) to buy a tuned part |
+| UnmountAllBodyPartsKeyCode | N | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html) to unmount all body parts |
 | PriceDiscount | 15 | Discounts the price by x% |
 | BuyAdditionalParts | true | Whether to buy required parts (Ex: When buying a Piston, it buys Piston Rings) |
 | BuyNormalPartIfTunedPartDoesntExist  | false | Self explanatory |
@@ -43,8 +46,9 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
  - [x] Add modifier keys to purchase multiple items at once (Thanks to [DefilerOfFate](https://www.nexusmods.com/users/82238008) for the suggestion)
  - [x] Fix mod randomly stuck buying the wrong part
  - [x] Add cost of parts to the end of the popups
+ - [ ] Fix buying license plates being broken
 
-## QuickShop_parts.json
+## AnyasQuickShop_parts.json
 - Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
 - Ids can be figured out by using `ALT + N`
 - If you're messing with this you probably know what you're doing anyway
