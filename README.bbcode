@@ -4,9 +4,9 @@ A [url=https://store.steampowered.com/app/1190000/Car_Mechanic_Simulator_2021]Ca
 [b][u]Installation[/u][/b]
 [list]
 [*] Install Melon Loader (using [url=https://melonwiki.xyz/#/?id=automated-installation]Melon Loader Automated Installer[/url])
-[*] Download the .dll from [url=https://www.nexusmods.com/carmechanicsimulator2021/mods/103]nexus[/url] or [url=https://github.com/keifufu/QuickShop/releases/latest]GitHub[/url]
+[*] Download the .dll from [url=https://www.nexusmods.com/carmechanicsimulator2021/mods/103]nexus[/url] or [url=https://github.com/keifufu/AnyasQuickShop/releases/latest]GitHub[/url]
 [*] Move the .dll into your Mods directory (GameFolder/Mods/)
-[*] (optional) Configure file created at (Mods/QuickShop.cfg)
+[*] (optional) Configure file created at (Mods/AnyasQuickShop.cfg)
 [/list]
 
 [b][u]Keybinds[/u][/b]
@@ -18,12 +18,15 @@ A [url=https://store.steampowered.com/app/1190000/Car_Mechanic_Simulator_2021]Ca
 [*][b]Space + (Key)[/b] - Buy Part x16
 [*][b]Alt + B[/b] - Reload Config
 [*][b]Alt + N[/b] - Show ID of hovered part
+[*][b]Delete[/b] - Unmount all body parts
+[*][b]Home[/b] - Buy all missing parts
 [/list]
 
 [b][u]Config[/u][/b]
 [list]
 [*] [b]BuyKeyCode[/b]: [url=https://docs.unity3d.com/ScriptReference/KeyCode.html]KeyCode[/url] to buy a part
 [*] [b]BuyTunedKeyCode[/b]: [url=https://docs.unity3d.com/ScriptReference/KeyCode.html]KeyCode[/url] to buy a tuned part
+[*] [b]UnmountAllBodyPartsKeyCode[/b]: [url=https://docs.unity3d.com/ScriptReference/KeyCode.html]KeyCode[/url] to unmount all body parts
 [*] [b]PriceDiscount[/b]: Discounts the price by x%
 [*] [b]BuyAdditionalParts[/b]: Whether to buy required parts (Ex: When buying a Piston, it buys Piston Rings)
 [*] [b]BuyNormalPartIfTunedPartDoesntExist[/b]:  Self explanatory
@@ -48,9 +51,10 @@ A [url=https://store.steampowered.com/app/1190000/Car_Mechanic_Simulator_2021]Ca
 [*] [x] Add modifier keys to purchase multiple items at once (Thanks to [url=https://www.nexusmods.com/users/82238008]DefilerOfFate[/url] for the suggestion)
 [*] [x] Fix mod randomly stuck buying the wrong part
 [*] [x] Add cost of parts to the end of the popups
+[*] [ ] Fix buying license plates being broken
 [/list]
 
-[b][u]QuickShop_parts.json[/u][/b]
+[b][u]AnyasQuickShop_parts.json[/u][/b]
 [list]
 [*] Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
 [*] Ids can be figured out by using `ALT + N`
