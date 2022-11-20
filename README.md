@@ -16,7 +16,6 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 - **Alt + B** - Reload Config
 - **Alt + N** - Show ID of hovered part
 - **Delete** - Unmount all body parts
-- **Home** - Buy all missing parts
 
 ## Config
 | Name | Default | Description |
