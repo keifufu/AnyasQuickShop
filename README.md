@@ -22,7 +22,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
 | --- | --- | --- |
 | BuyKeyCode | B | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html)  to buy a part |
 | BuyTunedKeyCode | N | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html) to buy a tuned part |
-| UnmountAllBodyPartsKeyCode | N | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html) to unmount all body parts |
+| UnmountAllBodyPartsKeyCode | Delete | [KeyCode](https://docs.unity3d.com/ScriptReference/KeyCode.html) to unmount all body parts |
 | PriceDiscount | 15 | Discounts the price by x% |
 | BuyAdditionalParts | true | Whether to buy required parts (Ex: When buying a Piston, it buys Piston Rings) |
 | BuyNormalPartIfTunedPartDoesntExist  | false | Self explanatory |
