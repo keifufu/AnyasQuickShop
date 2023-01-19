@@ -45,6 +45,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
  - [x] Add modifier keys to purchase multiple items at once (Thanks to [DefilerOfFate](https://www.nexusmods.com/users/82238008) for the suggestion)
  - [x] Fix mod randomly stuck buying the wrong part
  - [x] Add cost of parts to the end of the popups
+ - [x] Fix being able to buy parts while in menus
  - [ ] Fix buying license plates being broken
 
 ## AnyasQuickShop_parts.json
