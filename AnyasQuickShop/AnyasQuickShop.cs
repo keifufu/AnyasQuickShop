@@ -1,6 +1,7 @@
 ﻿using MelonLoader;
 using AnyasQuickShop;
 using UnityEngine;
+using CMS.UI;
 
 [assembly: MelonInfo(typeof(AnyasQuickShop.AnyasQuickShop), "AnyasQuickShop", "0.4.5", "keifufu")]
 [assembly: MelonGame("Red Dot Games", "Car Mechanic Simulator 2021")]
@@ -24,6 +25,9 @@ namespace AnyasQuickShop
 
         public override void OnUpdate()
         {
+            if (WindowManager.Instance && WindowManager.Instance.IsAnyWindowOpened())
+                return;
+
             if (unmountAllBodyPartsConfirmationTimer > 0 || unmountAllBodyPartsConfirmed)
             {
                 unmountAllBodyPartsConfirmationTimer--;
