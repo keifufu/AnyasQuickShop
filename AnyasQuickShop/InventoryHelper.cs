@@ -142,14 +142,12 @@ namespace AnyasQuickShop
             // Create license plate
             if (ItemID.Contains("license_"))
             {
-                uiManager.ShowPopup(Config.ModName, "Buying License Plates is currently broken", PopupType.Buy);
-                return;
-                // item.LPData = new LPData
-                // {
-                //    Name = _config.LicensePlateType,
-                //    Custom = _config.LicensePlateText
-                // }; ;
-                // item.ID = "LicensePlate";
+                item.LPData = new LPData
+                {
+                   Name = _config.LicensePlateType,
+                   Custom = _config.LicensePlateText
+                }; ;
+                item.ID = "LicensePlate";
             }
 
             // Calculate rim data and price
