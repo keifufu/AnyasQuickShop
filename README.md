@@ -46,7 +46,7 @@ A [Car Mechanic Simulator 2021](https://store.steampowered.com/app/1190000/Car_M
  - [x] Fix mod randomly stuck buying the wrong part
  - [x] Add cost of parts to the end of the popups
  - [x] Fix being able to buy parts while in menus
- - [ ] Fix buying license plates being broken
+ - [x] Fix buying license plates being broken
 
 ## AnyasQuickShop_parts.json
 - Json file that holds information about which parts to buy if `BuyAdditionalParts` is enabled.  
